@@ -9,7 +9,7 @@ import Favorite from "./pages/Favorite";
 import MovieDetails from "./pages/MovieDetails";
 import { Toaster } from "react-hot-toast";
 import { useLocation } from "react-router-dom";
-
+import Movies from "./pages/Movies";
 const App = () => {
   const isAdminRoute = useLocation().pathname.startsWith("/admin");
   return (
@@ -18,7 +18,7 @@ const App = () => {
       {!isAdminRoute && <Navbar />}
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/movies" element={<div>Movies Page</div>} />
+        <Route path="/movies" element={<Movies/>} />
         <Route path="/movies/:id" element={<MovieDetails />} />
         <Route path="/movies/:id/:date" element={<SeatLayout />} />
         <Route path="/my-bookings" element={<MyBookings />} />
