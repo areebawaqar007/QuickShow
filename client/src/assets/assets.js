@@ -14,24 +14,44 @@ export const assets = {
     profile
 }
 
+// export const dummyTrailers = [
+//     {
+//         image: "https://img.youtube.com/vi/WpW36ldAqnM/maxresdefault.jpg",
+//         videoUrl: 'https://www.youtube.com/watch?v=WpW36ldAqnM'
+//     },
+//     {
+//         image: "https://img.youtube.com/vi/-sAOWhvheK8/maxresdefault.jpg",
+//         videoUrl: 'https://www.youtube.com/watch?v=-sAOWhvheK8'
+//     },
+//     {
+//         image: "https://img.youtube.com/vi/1pHDWnXmK7Y/maxresdefault.jpg",
+//         videoUrl: 'https://www.youtube.com/watch?v=1pHDWnXmK7Y'
+//     },
+//     {
+//         image: "https://img.youtube.com/vi/umiKiW4En9g/maxresdefault.jpg",
+//         videoUrl: 'https://www.youtube.com/watch?v=umiKiW4En9g'
+//     },
+// ]
+
 export const dummyTrailers = [
     {
         image: "https://img.youtube.com/vi/WpW36ldAqnM/maxresdefault.jpg",
-        videoUrl: 'https://www.youtube.com/watch?v=WpW36ldAqnM'
+        videoUrl: 'https://www.youtube.com/embed/r6j-wSIqJJ0?si=ES4-Zl8uuJbWUmAq'
     },
     {
         image: "https://img.youtube.com/vi/-sAOWhvheK8/maxresdefault.jpg",
-        videoUrl: 'https://www.youtube.com/watch?v=-sAOWhvheK8'
+        videoUrl: 'https://www.youtube.com/embed/-sAOWhvheK8?si=AY97L-KkKbhY37PQ'
     },
     {
         image: "https://img.youtube.com/vi/1pHDWnXmK7Y/maxresdefault.jpg",
-        videoUrl: 'https://www.youtube.com/watch?v=1pHDWnXmK7Y'
+        videoUrl: 'https://www.youtube.com/embed/1pHDWnXmK7Y?si=ObDBJqGKHhDG6Bl2'
     },
     {
         image: "https://img.youtube.com/vi/umiKiW4En9g/maxresdefault.jpg",
-        videoUrl: 'https://www.youtube.com/watch?v=umiKiW4En9g'
+        videoUrl: 'https://www.youtube.com/embed/x9D0uUKJ5KI?si=NHroqR4DZ4Ly4HME'
     },
 ]
+
 
 const dummyCastsData = [
     { "name": "Milla Jovovich", "profile_path": "https://image.tmdb.org/t/p/original/usWnHCzbADijULREZYSJ0qfM00y.jpg", },
