@@ -1,69 +1,155 @@
-import React from "react";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { dummyShowsData, dummyDateTimeData } from "../assets/assets";
-// import timeFormat from '../lib/TimeFormat';
-import { ClockIcon } from "lucide-react";
+import { assets, dummyShowsData, dummyDateTimeData } from "../assets/assets";
+import { ClockIcon, ArrowRight } from "lucide-react";
+import { toast } from "react-hot-toast";
 import BlurCircle from "../components/BlurCircle";
-import Loading from "../components/Loading";
 import timeFormat from "../lib/timeFormat";
+
 const SeatLayout = () => {
   const { id, date } = useParams();
-
-  const [selectedSeats, setSelectedSeats] = useState([]);
-  const [selectedTime, setSelectedTime] = useState(null);
-  const [show, setShow] = useState(null);
-
   const navigate = useNavigate();
 
-  const getShow = async () => {
+  const [show, setShow] = useState(null);
+  const [selectedSeats, setSelectedSeats] = useState([]);
+  const [selectedTime, setSelectedTime] = useState(null);
+
+  // Temporary dummy data for occupied seats
+  const occupiedSeats = [];
+
+  const groupRows = [
+    ["A", "B"],
+    ["C", "D"],
+    ["E", "F"],
+    ["G", "H", "I"],
+    ["J", "K", "L"],
+  ];
+
+  // Find the movie and its available showtimes
+  useEffect(() => {
     const movie = dummyShowsData.find((movie) => movie._id === id);
 
     if (movie) {
       setShow({
-        movie: movie,
+        movie,
         datetime: dummyDateTimeData,
       });
+    } else {
+      setShow(null);
     }
-  };
-
-  useEffect(() => {
-    getShow();
   }, [id]);
 
+  // Handle seat selection
+  const handleSeatClick = (seatId) => {
+    if (!selectedTime) {
+      return toast.error("Please select a time first");
+    }
+
+    if (occupiedSeats.includes(seatId)) {
+      return toast.error("This seat is already booked");
+    }
+
+    if (
+      !selectedSeats.includes(seatId) &&
+      selectedSeats.length >= 5
+    ) {
+      return toast.error("You can select a maximum of 5 seats");
+    }
+
+    setSelectedSeats((prev) =>
+      prev.includes(seatId)
+        ? prev.filter((seat) => seat !== seatId)
+        : [...prev, seatId]
+    );
+  };
+
+  // Render seats for a row
+  const renderSeats = (row, count = 9) => {
+    return (
+      <div key={row} className="flex w-full justify-center mb-3">
+        <div className="grid grid-cols-9 gap-1 sm:gap-2 md:gap-3">
+          {Array.from({ length: count }, (_, i) => {
+            const seatId = `${row}${i + 1}`;
+            const isSelected = selectedSeats.includes(seatId);
+            const isOccupied = occupiedSeats.includes(seatId);
+
+            return (
+              <button
+                key={seatId}
+                onClick={() => handleSeatClick(seatId)}
+                disabled={isOccupied}
+                title={seatId}
+                className={`aspect-square w-8 rounded border border-primary/60 text-xs transition md:w-8 lg:w-10 ${
+                  isSelected ? "bg-primary text-white" : ""
+                } ${
+                  isOccupied
+                    ? "cursor-not-allowed opacity-30"
+                    : "cursor-pointer"
+                }`}
+              >
+                {seatId}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    );
+  };
+
+  // Show loading state until movie data is available
   if (!show) {
-    return <Loading />;
+    return (
+      <div className="mt-32 text-center text-white">
+        Loading...
+      </div>
+    );
   }
 
-  // Get timings for the date selected on the previous page
+  // Get showtimes for the selected date
   const timings = show.datetime[date] || [];
 
+  // Handle checkout
+  const createBooking = () => {
+    if (!selectedTime) {
+      return toast.error("Please select a showtime");
+    }
+
+    if (selectedSeats.length === 0) {
+      return toast.error("Please select at least one seat");
+    }
+
+    toast.success("Seats selected successfully!");
+    
+    // Booking and payment logic can be added here.
+  };
+
   return (
-    <div className="flex flex-col xl:flex-row px-6 md:px-16 lg:px-24 py-12 mt-30 md:pt-10 max-sm:mt-10">
+    <div className="mt-30 flex flex-col px-6 py-12 md:px-16 md:pt-10 lg:px-24 max-sm:mt-10 xl:flex-row">
       {/* Available Timings */}
-      <div className="relative w-60 bg-primary/10 border border-primary/20 rounded-lg py-10 h-max">
+      <div className="relative h-max w-60 rounded-lg border border-primary/20 bg-primary/10 py-10">
         <BlurCircle top="-100px" left="0px" />
 
-        <p className="text-lg font-semibold px-6 text-white">
+        <p className="px-6 text-lg font-semibold text-white">
           Available Timings
         </p>
 
         <div className="mt-4 space-y-1 text-white">
           {timings.length > 0 ? (
             timings.map((item) => (
-              <div
+              <button
                 key={item.showId}
                 onClick={() => setSelectedTime(item)}
-                className={`flex items-center gap-2 px-6 py-2 w-full rounded-r-md cursor-pointer transition ${
+                className={`flex w-full cursor-pointer items-center gap-2 rounded-r-md px-6 py-2 transition ${
                   selectedTime?.showId === item.showId
                     ? "bg-primary text-white"
                     : "hover:bg-primary/20"
                 }`}
               >
-                <ClockIcon className="w-4 h-4" />
-
-                <p className="text-sm">{timeFormat(item.time)}</p>
-              </div>
+                <ClockIcon className="h-4 w-4" />
+                <span className="text-sm">
+                  {timeFormat(item.time)}
+                </span>
+              </button>
             ))
           ) : (
             <p className="px-6 text-sm text-gray-400">
@@ -73,15 +159,47 @@ const SeatLayout = () => {
         </div>
       </div>
 
-      {/* Seat Selection Placeholder */}
-      <div className="relative flex flex-1 flex-col items-center max-md:mt-15 text-white">
+      {/* Seat Selection */}
+      <div className="relative mt-10 flex flex-1 flex-col items-center xl:mt-0">
         <BlurCircle bottom="-40px" right="0" />
 
-        <h1 className="text-3xl font-semibold mb-7">Select your seat</h1>
+        <h1 className="mb-7 text-3xl font-semibold text-white">
+          Select Your Seats
+        </h1>
 
-        {!selectedTime && (
-          <p className="text-gray-400">Please select a show timing first.</p>
-        )}
+        <img src={assets.screenImage} alt="Cinema screen" />
+
+        <p className="text-sm font-medium text-white">
+          SCREEN SIDE
+        </p>
+
+        <div className="mt-10 flex w-full flex-col items-center text-xs font-medium text-white">
+          <div className="w-full">
+            {groupRows[0].map((row) => renderSeats(row))}
+          </div>
+
+          <div className="mt-6 grid w-full grid-cols-1 gap-8 sm:grid-cols-2">
+            {groupRows.slice(1).map((group, index) => (
+              <div
+                key={index}
+                className="flex w-full flex-col items-center"
+              >
+                {group.map((row) => renderSeats(row))}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Checkout Button */}
+        <div className="mt-10 flex justify-center">
+          <button
+            onClick= {()=>navigate('/my-bookings')}
+            className="my-5 flex cursor-pointer items-center gap-2 rounded-full bg-primary px-8 py-3 font-medium transition hover:bg-primary-dull max-md:px-5 max-md:text-sm"
+          >
+            Proceed to Checkout
+            <ArrowRight className="h-5 w-5 transition duration-300 hover:translate-x-1" />
+          </button>
+        </div>
       </div>
     </div>
   );
