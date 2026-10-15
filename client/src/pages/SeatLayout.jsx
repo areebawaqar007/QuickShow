@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { assets, dummyShowsData, dummyDateTimeData } from "../assets/assets";
 import { ClockIcon, ArrowRight } from "lucide-react";
-import { toast } from "react-hot-toast";
 import BlurCircle from "../components/BlurCircle";
 import timeFormat from "../lib/timeFormat";
 
@@ -14,7 +13,6 @@ const SeatLayout = () => {
   const [selectedSeats, setSelectedSeats] = useState([]);
   const [selectedTime, setSelectedTime] = useState(null);
 
-  // Temporary dummy data for occupied seats
   const occupiedSeats = [];
 
   const groupRows = [
@@ -25,7 +23,6 @@ const SeatLayout = () => {
     ["J", "K", "L"],
   ];
 
-  // Find the movie and its available showtimes
   useEffect(() => {
     const movie = dummyShowsData.find((movie) => movie._id === id);
 
@@ -39,21 +36,17 @@ const SeatLayout = () => {
     }
   }, [id]);
 
-  // Handle seat selection
   const handleSeatClick = (seatId) => {
     if (!selectedTime) {
-      return toast.error("Please select a time first");
+      return;
     }
 
     if (occupiedSeats.includes(seatId)) {
-      return toast.error("This seat is already booked");
+      return;
     }
 
-    if (
-      !selectedSeats.includes(seatId) &&
-      selectedSeats.length >= 5
-    ) {
-      return toast.error("You can select a maximum of 5 seats");
+    if (!selectedSeats.includes(seatId) && selectedSeats.length >= 5) {
+      return;
     }
 
     setSelectedSeats((prev) =>
@@ -63,7 +56,6 @@ const SeatLayout = () => {
     );
   };
 
-  // Render seats for a row
   const renderSeats = (row, count = 9) => {
     return (
       <div key={row} className="flex w-full justify-center mb-3">
@@ -96,7 +88,6 @@ const SeatLayout = () => {
     );
   };
 
-  // Show loading state until movie data is available
   if (!show) {
     return (
       <div className="mt-32 text-center text-white">
@@ -105,23 +96,7 @@ const SeatLayout = () => {
     );
   }
 
-  // Get showtimes for the selected date
   const timings = show.datetime[date] || [];
-
-  // Handle checkout
-  const createBooking = () => {
-    if (!selectedTime) {
-      return toast.error("Please select a showtime");
-    }
-
-    if (selectedSeats.length === 0) {
-      return toast.error("Please select at least one seat");
-    }
-
-    toast.success("Seats selected successfully!");
-    
-    // Booking and payment logic can be added here.
-  };
 
   return (
     <div className="mt-30 flex flex-col px-6 py-12 md:px-16 md:pt-10 lg:px-24 max-sm:mt-10 xl:flex-row">
@@ -193,7 +168,7 @@ const SeatLayout = () => {
         {/* Checkout Button */}
         <div className="mt-10 flex justify-center">
           <button
-            onClick= {()=>navigate('/my-bookings')}
+            onClick={() => navigate("/my-bookings")}
             className="my-5 flex cursor-pointer items-center gap-2 rounded-full bg-primary px-8 py-3 font-medium transition hover:bg-primary-dull max-md:px-5 max-md:text-sm"
           >
             Proceed to Checkout
