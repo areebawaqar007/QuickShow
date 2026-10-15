@@ -1,7 +1,11 @@
-const timeFormat = (minutes) => {
-  const hours = Math.floor(minutes / 60);
-  const minutesRemainder = minutes % 60;
-  return `${hours}h ${minutesRemainder}m`;
+const timeFormat = (time) => {
+  const date = new Date(time);
+
+  return date.toLocaleTimeString('en-IN', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true,
+  });
 };
 
 export default timeFormat;
