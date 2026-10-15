@@ -50,3 +50,11 @@ const MovieCard = ({ movie }) => {
 };
 
 export default MovieCard;
+
+
+
+// .filter(Boolean) — Removes falsy values such as null, undefined, and false from the array.
+// .map((movie) => ...) — Loops through each remaining movie and renders a MovieCard.
+// movie._id ? ... : null — Displays the card only if the movie has an _id; otherwise, it renders nothing.
+// key={movie._id} — Gives each card a unique key so React can track list items.
+// movie={movie} — Passes the movie object to the MovieCard component through props
