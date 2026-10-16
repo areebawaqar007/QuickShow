@@ -14,7 +14,7 @@ import Layout from "./pages/admin/Layout";
 import Dashboard from "./pages/admin/Dashboard";
 import Addshow from "./pages/admin/Addshow";
 import Listshow from "./pages/admin/Listshow";
-import Listbookings from "./pages/admin/Listbookings";
+import Listbookings from "./pages/admin/Listbooking";
 
 const App = () => {
   const isAdminRoute = useLocation().pathname.startsWith("/admin");
