@@ -1,15 +1,16 @@
 import { Inngest } from 'inngest';
 import User from '../models/User.js';
 
+// Initialize Inngest
 export const inngest = new Inngest({
   id: 'movie-ticket-booking',
 });
 
-// Create User
+// Create User when a new user signs up through Clerk
 const syncUserCreation = inngest.createFunction(
   {
     id: 'sync-user-from-clerk',
-    triggers: [{ event: 'clerk/user.created' }],
+    triggers: { event: 'clerk/user.created' },
   },
   async ({ event }) => {
     const { id, first_name, last_name, email_addresses, image_url } =
@@ -17,7 +18,7 @@ const syncUserCreation = inngest.createFunction(
 
     const userData = {
       _id: id,
-      email: email_addresses[0]?.email_address,
+      email: email_addresses?.[0]?.email_address,
       name: `${first_name || ''} ${last_name || ''}`.trim(),
       image: image_url,
     };
@@ -26,24 +27,26 @@ const syncUserCreation = inngest.createFunction(
   }
 );
 
-// Delete User
+// Delete User when the user is deleted from Clerk
 const syncUserDeletion = inngest.createFunction(
   {
     id: 'delete-user-with-clerk',
-    triggers: [{ event: 'clerk/user.deleted' }],
+    triggers: { event: 'clerk/user.deleted' },
   },
   async ({ event }) => {
     const { id } = event.data;
 
-    await User.findByIdAndDelete(id);
+    if (id) {
+      await User.findByIdAndDelete(id);
+    }
   }
 );
 
-// Update User
+// Update User when the user's information changes in Clerk
 const syncUserUpdation = inngest.createFunction(
   {
     id: 'update-user-with-clerk',
-    triggers: [{ event: 'clerk/user.updated' }],
+    triggers: { event: 'clerk/user.updated' },
   },
   async ({ event }) => {
     const { id, first_name, last_name, email_addresses, image_url } =
@@ -59,7 +62,7 @@ const syncUserUpdation = inngest.createFunction(
   }
 );
 
-// Export all functions for Inngest registration.
+// Export all functions for Inngest registration
 export const functions = [
   syncUserCreation,
   syncUserDeletion,
