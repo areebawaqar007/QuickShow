@@ -13,7 +13,7 @@ import Movies from "./pages/Movies";
 import Layout from "./pages/admin/Layout";
 import Dashboard from "./pages/admin/Dashboard";
 import Addshow from "./pages/admin/Addshow";
-import Listshow from "./pages/admin/Listshow";
+import Listshows from "./pages/admin/Listshows";
 import Listbookings from "./pages/admin/Listbooking";
 
 const App = () => {
@@ -38,7 +38,7 @@ const App = () => {
         <Route path="/admin/*" element={<Layout />}>
           <Route index element={<Dashboard />} />
           <Route path="add-shows" element={<Addshow />} />
-          <Route path="list-shows" element={<Listshow />} />
+          <Route path="list-shows" element={<Listshows />} />
           <Route path="list-bookings" element={<Listbookings />} />
         </Route>
       </Routes>

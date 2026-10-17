@@ -11,7 +11,6 @@ import { dummyDashboardData } from "../../assets/assets";
 import Title from "../../components/admin/Title";
 import BlurCircle from "../../components/BlurCircle";
 import formatDateTime from "../../lib/DateCalculate";
-
 const Dashboard = () => {
   const currency = import.meta.env.VITE_CURRENCY;
   const image_base_url = "https://image.tmdb.org/t/p/w500";
