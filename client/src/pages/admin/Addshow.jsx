@@ -4,7 +4,9 @@ import { dummyShowsData, dummyDateTimeData } from '../../assets/assets';
 import Title from '../../components/admin/Title';
 import Loading from '../../components/Loading';
 import { CheckIcon, StarIcon } from 'lucide-react';
-
+import BlurCircle from '../../components/BlurCircle';
+// import { dateFormat } from '../../lib/dateFormat';
+import { KConverter } from '../../lib/kConverter';
 const AddShow = () => {
   // Get the currency symbol from your environment variables.
   const currency = import.meta.env.VITE_CURRENCY;
@@ -70,7 +72,7 @@ const AddShow = () => {
                 </div>
 
                 <p className="text-xs text-gray-400">
-                  {movie.vote_count || 0} Votes
+                  {KConverter(movie.vote_count || 0)} Votes
                 </p>
 
                 {/* SELECTION INDICATOR: Show a checkmark on the selected movie. */}
