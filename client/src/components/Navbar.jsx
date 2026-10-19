@@ -39,7 +39,7 @@ const Navbar = () => {
           Movies
         </Link>
 
-        <Link to="/" onClick={() => setIsOpen(false)}>
+        {/* <Link to="/" onClick={() => setIsOpen(false)}>
           Theaters
         </Link>
 
@@ -49,7 +49,7 @@ const Navbar = () => {
 
         <Link to="/favorite" onClick={() => setIsOpen(false)}>
           Favorites
-        </Link>
+        </Link> */}
       </div>
 
       {/* Search + Login */}
