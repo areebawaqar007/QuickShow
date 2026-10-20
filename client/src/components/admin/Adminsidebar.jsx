@@ -27,14 +27,10 @@ const Adminsidebar = () => {
   ];
 
   return (
-    <div>
-      <img
-        src={user.imageUrl}
-        alt="Profile"
-        className="w-16 h-16 rounded-full"
-      />
+     <div className="h-[calc(100vh - 64px)] md:flex flex-col items-center pt-8 max-w-13 md:max-w-60 w-full border-r border-gray-300/20 text-sm">
+      <img src={user.imageUrl} alt="image" />
 
-      <p>
+      <p className="mt-2 text-base max-md:hidden">
         {user.firstName} {user.lastName}
       </p>
 
