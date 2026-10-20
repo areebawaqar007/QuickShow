@@ -3,6 +3,8 @@ import cors from 'cors';
 import { clerkMiddleware } from '@clerk/express'
 import ShowRouter from './routes/showRoute.js';
 import bookingRouter from './routes/bookingRoutes.js';
+import adminRouter from './routes/adminRoutes.js';
+import userRoutes from './routes/userRoutes.js';
 import 'dotenv/config';
 import connectDB from './configs/db.js';
 import { serve } from 'inngest/express';
@@ -26,7 +28,8 @@ app.get('/', (req, res) => res.send('Server is Live!'));
 app.use('/api/inngest', serve({ client: inngest, functions }));
 app.use('/api/show', ShowRouter);
 app.use('/api/booking', bookingRouter);
-
+app.use('/api/admin', adminRouter);
+app.use('/api/user', userRoutes);
 
 app.listen(port, () =>
   console.log(`Server listening at http://localhost:${port}`)
