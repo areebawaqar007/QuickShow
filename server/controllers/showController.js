@@ -95,3 +95,69 @@ export const addShow = async (req, res) => {
     res.json({ success: false, message: error.message });
   }
 };
+
+
+// This function retrieves movies that have upcoming shows,
+//   removes duplicate movies, and sends the unique movies to the frontend.
+
+export const getShows = async (req, res) => {
+  try {
+    // Find shows whose date and time are greater than or equal to the current date and time.
+    const shows = await Show.find({ showDateTime: { $gte: new Date() } })
+      .populate('movie')
+      .sort({ showDateTime: 1 });
+
+    const uniqueShows = new Set(shows.map((show) => show.movie));
+
+    res.json({ success: true, shows: Array.from(uniqueShows) });
+  } catch (error) {
+    console.error(error);
+
+    res.json({ success: false, message: error.message });
+  }
+};
+
+// new Date()
+
+// Gets the current date and time.
+// .populate('movie')
+
+// Mongoose replaces the movie reference with the corresponding movie document,
+//   provided that your schema defines the appropriate reference.
+// populate() retrieves the actual movie information instead of leaving you with just its ID.
+
+
+// This function gets all upcoming showtimes for one particular movie and organizes them by date 
+// before sending them to the frontend.
+export const getShow = async (req, res) => {
+  try {
+    const { movieId } = req.params;
+    const shows = await Show.find({
+      movie: movieId,
+      showDateTime: { $gte: new Date() },
+    });
+    const movie = await Movie.findById(movieId);
+    const dateTime = {};
+
+    shows.forEach((show) => {
+      const date = show.showDateTime.toISOString().split('T')[0];
+      if (!dateTime[date]) {
+        dateTime[date] = [];
+      }
+      console.log(
+        'Show ID being sent to frontend:',
+        show._id,
+        'Type:',
+        typeof show._id,
+        'Stringified:',
+        show._id.toString()
+      );
+      dateTime[date].push({ time: show.showDateTime, showId: show._id.toString() });
+    });
+
+    res.json({ success: true, movie, dateTime });
+  } catch (error) {
+    console.error(error);
+    res.json({ success: false, message: error.message });
+  }
+};
