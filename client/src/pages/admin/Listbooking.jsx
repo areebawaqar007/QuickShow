@@ -1,78 +1,81 @@
-import React, { useEffect, useState } from "react";
-import Loading from "../../components/Loading";
-import Title from "../../components/admin/Title";
-import { dummyBookingData } from "../../assets/assets";
-import formatDateTime from "../../lib/DateCalculate";
-const Listbooking = () => {
+import { useEffect, useState } from 'react';
+import Loading from '../../components/Loading';
+import Title from '../../components/admin/Title';
+import { dateFormat } from '../../lib/dateFormat';
+import { useAppContext } from '../../context/AppContext';
+
+const ListBookings = () => {
   const currency = import.meta.env.VITE_CURRENCY;
+  const { axios, getToken, user } = useAppContext();
 
   const [bookings, setBookings] = useState([]);
-  const [loading, setIsLoading] = useState(true);
+
+  const [loading, setLoading] = useState(true);
 
   const getAllBookings = async () => {
     try {
-      setBookings(dummyBookingData);
+      const { data } = await axios.get('/api/admin/all-bookings', {
+        headers: { Authrization: `Bearer ${await getToken()}` },
+      });
+
+      setBookings(data.bookings);
     } catch (error) {
       console.error(error);
-    } finally {
-      setIsLoading(false);
     }
+    setLoading(false);
   };
 
   useEffect(() => {
-    getAllBookings();
-  }, []);
+    if (user) {
+      getAllBookings();
+    }
+  }, [user]);
 
   return !loading ? (
-    <div className="relative w-full min-h-screen p-4 text-white">
+    <>
       <Title text1="List" text2="Bookings" />
 
-      <div className="max-w-5xl mt-6 overflow-x-auto">
+      <div className="max-w-4xl mt-6 overflow-x-auto">
         <table className="w-full border-collapse rounded-md overflow-hidden text-nowrap">
           <thead>
             <tr className="bg-primary/20 text-left text-white">
-              <th className="p-3 font-medium">User Name</th>
-              <th className="p-3 font-medium">Movie Name</th>
-              <th className="p-3 font-medium">Show Time</th>
-              <th className="p-3 font-medium">Seats</th>
-              <th className="p-3 font-medium">Amount</th>
+              <th className="p-2 font-medium pl-5">User Name</th>
+              <th className="p-2 font-medium">Movie Name</th>
+              <th className="p-2 font-medium">Show Time</th>
+              <th className="p-2 font-medium">Seats</th>
+              <th className="p-2 font-medium">Amount</th>
             </tr>
           </thead>
 
-<tbody className="text-sm font-light">
-  {bookings.map((show, index) => {
-    const seats = show?.bookedseats || [];
-    const showData = show?.show || {};
-    const movie = showData?.movie || {};
-    const showTime = showData?.showDateTime || "";
-    const seatCount = seats.length;
-    const price = showData?.showprice || 0;
-    const userName = show?.user?.name || "N/A";
+          <tbody className="text-sm font-light">
+            {bookings?.map((item, index) => (
+              <tr
+                key={index}
+                className="border-b border-primary/20 bg-primary/5 even:bg-primary/10"
+              >
+                <td className="p-2 min-w-45 pl-5">{item.user.name}</td>
 
-    return (
-      <tr
-        key={index}
-        className="border-b border-primary/10 bg-primary/5 even:bg-primary/10 whitespace-nowrap"
-      >
-        <td className="p-3">{userName}</td>
-        <td className="p-3">{movie?.originalTitle || movie?.title || "N/A"}</td>
-        <td className="p-3">
-          {showTime ? formatDateTime(showTime)?.replace("•", " at") : "N/A"}
-        </td>
-        <td className="p-3">{seats.join(", ") || "N/A"}</td>
-        <td className="p-3">
-          {currency} {seatCount * price}
-        </td>
-      </tr>
-    );
-  })}
-</tbody>
+                <td className="p-2 ">{item.show.movie.title}</td>
+
+                <td className="p-2">{dateFormat(item.show.showDateTime)}</td>
+
+                <td className="p-2">
+                  {Object.keys(item.bookedSeats)
+                    .map((seat) => item.bookedSeats[seat])
+                    .join(', ')}
+                </td>
+
+                <td className="p-2">
+                  {currency} {item.amount}
+                </td>
+              </tr>
+            ))}
+          </tbody>
         </table>
       </div>
-    </div>
+    </>
   ) : (
     <Loading />
   );
 };
-
-export default Listbooking;
+export default ListBookings;

@@ -1,80 +1,59 @@
-import React, { useState, useEffect } from "react";
-import { dummyShowsData, dummyDateTimeData } from "../../assets/assets";
-import Title from "../../components/admin/Title";
+import { useEffect, useState } from "react";
 import Loading from "../../components/Loading";
-import BlurCircle from "../../components/BlurCircle";
+import Title from "../../components/admin/Title";
 import { dateFormat } from "../../lib/dateFormat";
-const Listshows = () => {
+import { useAppContext } from "../../context/AppContext";
+
+const ListShows = () => {
+  const { axios, getToken, user } = useAppContext();
+
   const currency = import.meta.env.VITE_CURRENCY;
 
   const [shows, setShows] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const getAllShows = async () => {
+  const getAllShow = async () => {
     try {
-      setShows([
-        {
-          movie: dummyShowsData[0],
-          showDateTime: dummyDateTimeData[0],
-          showPrice: 59,
-          occupiedSeats: {
-            A1: "user_1",
-            B1: "user_2",
-          },
-        },
-      ]);
-    } catch (error) {
-      console.log(error);
-    } finally {
+      const { data } = await axios.get("/api/admin/all-shows", {
+        headers: { Authorization: `Bearer ${await getToken()}` },
+      });
+      setShows(data.shows);
       setLoading(false);
+    } catch (error) {
+      console.error(error);
     }
   };
 
   useEffect(() => {
-    getAllShows();
-  }, []);
+    if (user) {
+      getAllShow();
+    }
+  }, [user]);
 
   return !loading ? (
-    <div className="w-full md:px-4 max-md:px-0 relative">
+    <>
       <Title text1="List" text2="Shows" />
-
-      <BlurCircle top="0" left="0" />
-
-      <div className="mt-6 overflow-x-auto">
-        <table className="min-w-full table-auto border-collapse text-sm text-white rounded-lg overflow-hidden max-md:text-xs">
+      <div className="max-w-4xl mt-6 overflow-x-auto">
+        <table className="w-full border-collapse rounded-md overflow-hidden text-nowrap">
           <thead>
-            <tr className="bg-primary/20 text-left whitespace-nowrap">
-              <th className="p-3 text-base font-semibold min-w-[140px]">
-                Movie Name
-              </th>
-              <th className="p-3 text-base font-semibold min-w-[120px]">
-                Show Time
-              </th>
-              <th className="p-3 text-base font-semibold min-w-[120px]">
-                Total Bookings
-              </th>
-              <th className="p-3 text-base font-semibold min-w-[100px]">
-                Earnings
-              </th>
+            <tr className="bg-primary/20 text-left text-white">
+              <th className="p-2 font-medium pl-5">Movie Name</th>
+              <th className="p-2 font-medium">Show Time</th>
+              <th className="p-2 font-medium">Total Bookings</th>
+              <th className="p-2 font-medium">Earnings</th>
             </tr>
           </thead>
-
-          <tbody className="text-sm font-light">
+          <tbody>
             {shows.map((show, index) => (
               <tr
                 key={index}
                 className="border-b border-primary/10 bg-primary/5 even:bg-primary/10"
               >
                 <td className="p-2 min-w-45 pl-5">{show.movie.title}</td>
-
-                <td className="p-2">
-                  {dateFormat(show.showDateTime)?.replace("•", " at")}
-                </td>
-
+                <td className="p-2">{dateFormat(show.showDateTime)}</td>
                 <td className="p-2">
                   {Object.keys(show.occupiedSeats).length}
                 </td>
-
                 <td className="p-2">
                   {currency}{" "}
                   {Object.keys(show.occupiedSeats).length * show.showPrice}
@@ -84,12 +63,10 @@ const Listshows = () => {
           </tbody>
         </table>
       </div>
-    </div>
+    </>
   ) : (
     <Loading />
   );
 };
 
-export default Listshows;
- 
-  
+export default ListShows;
