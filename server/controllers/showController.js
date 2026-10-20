@@ -1,6 +1,8 @@
 
 import axios from 'axios';
-
+import Movie from '../models/Movie.js';
+import Show from '../models/Show.js';
+import { inngest } from '../inngest/index.js';
 export const getNowPlayingMovies = async (req, res) => {
   try {
     const { data } = await axios.get(
@@ -11,6 +13,83 @@ export const getNowPlayingMovies = async (req, res) => {
     );
     const movies = data.results;
     res.json({ success: true, movies: movies });
+  } catch (error) {
+    console.error(error);
+    res.json({ success: false, message: error.message });
+  }
+};
+
+
+export const addShow = async (req, res) => {
+  try {
+    const { movieId, showsInput, showPrice } = req.body;
+    let movie = await Movie.findById(movieId);
+
+    if (!movie) {
+      // movie data
+      const [movieDetailResponse, movieCreditsResponse] = await Promise.all([
+        axios.get(`https://api.themoviedb.org/3/movie/${movieId}`, {
+          headers: { Authorization: `Bearer ${process.env.TMDB_API_KEY}` },
+        }),
+// cast data
+        axios.get(`https://api.themoviedb.org/3/movie/${movieId}/credits`, {
+          headers: { Authorization: `Bearer ${process.env.TMDB_API_KEY}` },
+        }),
+      ]);
+
+      const movieApiData = movieDetailResponse.data;
+      const movieCreditsData = movieCreditsResponse.data;
+
+      const movieDetails = {
+        _id: movieId,
+        title: movieApiData.title,
+        overview: movieApiData.overview,
+        poster_path: movieApiData.poster_path,
+        backdrop_path: movieApiData.backdrop_path,
+        release_date: movieApiData.release_date,
+        original_language: movieApiData.original_language,
+        genres: movieApiData.genres,
+        casts: movieCreditsData.cast,
+        tagline: movieApiData.tagline || '',
+        vote_average: movieApiData.vote_average,
+        runtime: movieApiData.runtime,
+      };
+
+      movie = await Movie.create(movieDetails);
+    }
+
+    const showsToCreate = [];
+
+    showsInput.forEach((show) => {
+      const showDate = show.date;
+      if (!showDate || !show.time) return; // skip invalid entries
+
+      // Ensure show.time is always treated as an array
+      const times = Array.isArray(show.time) ? show.time : [show.time];
+
+      times.forEach((time) => {
+        const dateTimeString = `${showDate}T${time}`;
+        showsToCreate.push({
+          movie: movieId,
+          showDateTime: new Date(dateTimeString),
+          showPrice,
+          occupiedSeats: {},
+        });
+      });
+    });
+
+    if (showsToCreate.length > 0) {
+      await Show.insertMany(showsToCreate);
+    }
+
+    await inngest.send({
+      name: 'app/show.added',
+      data: {
+        movieTitle: movie.title,
+      },
+    });
+
+    res.json({ success: true, message: 'Show Added Successfully' });
   } catch (error) {
     console.error(error);
     res.json({ success: false, message: error.message });
