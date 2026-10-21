@@ -125,26 +125,26 @@ Create a `.env` file in each folder and add your own values.
 
 **`server/.env`**
 ```env
-MONGODB_URI=
-CLERK_PUBLISHABLE_KEY=
-CLERK_SECRET_KEY=
-INNGEST_EVENT_KEY=
-INNGEST_SIGNING_KEY=
-TMDB_API_KEY=
-STRIPE_PUBLISHABLE_KEY=
-STRIPE_SECRET_KEY=
-STRIPE_WEBHOOK_SECRET=
-SENDER_EMAIL=
-SMTP_USER=
-SMTP_PASSWORD=
+MONGODB_URI                  # MongoDB database connection URI
+CLERK_PUBLISHABLE_KEY        # Clerk public key for authentication
+CLERK_SECRET_KEY             # Clerk secret key for server-side authentication
+INNGEST_EVENT_KEY            # Inngest key for sending background job events
+INNGEST_SIGNING_KEY          # Inngest key for verifying incoming event requests
+TMDB_API_KEY                 # TMDB API key for fetching movie information
+STRIPE_PUBLISHABLE_KEY       # Stripe publishable key for payment integration
+STRIPE_SECRET_KEY            # Stripe secret key for server-side payment processing
+STRIPE_WEBHOOK_SECRET        # Stripe webhook secret for verifying webhook events
+SENDER_EMAIL                 # Sender email address for application emails
+SMTP_USER                    # SMTP username for email authentication
+SMTP_PASSWORD                # SMTP password or app-specific password
 ```
 
 **`client/.env`**
 ```env
-VITE_CLERK_PUBLISHABLE_KEY=
-VITE_CURRENCY=
-VITE_BASE_URL=
-VITE_TMDB_IMAGE_BASE_URL=
+VITE_CLERK_PUBLISHABLE_KEY   # Clerk publishable key for frontend authentication
+VITE_CURRENCY                # Default currency symbol displayed in the application
+VITE_BASE_URL                # Backend API base URL
+VITE_TMDB_IMAGE_BASE_URL     # Base URL for TMDB movie images and posters
 ```
 
 
