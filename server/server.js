@@ -9,6 +9,7 @@ import 'dotenv/config';
 import connectDB from './configs/db.js';
 import { serve } from 'inngest/express';
 import { inngest, functions } from './inngest/index.js';
+import { stripeWebhooks } from './controllers/stripeWebhooks.js';
 
 const app = express();
 
@@ -17,8 +18,10 @@ const port = 3000;
 await connectDB();
 
 
+// stripe webhooks route
+app.use('/api/stripe',express.raw({type:'application/json'}),stripeWebhooks)
 
-
+// Middleware
 app.use(express.json());
 app.use(cors());
 app.use(clerkMiddleware())
