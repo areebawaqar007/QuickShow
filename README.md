@@ -160,3 +160,11 @@ Ideas and pull requests are welcome. Fork the repo, create a branch, and open a 
 
 ---
 
+## 📄 License
+
+Released under the MIT License.
+
+---
+
+<p align="center">Built by <a href="https://github.com/areebawaqar007">Areeba Waqar</a></p>
+
