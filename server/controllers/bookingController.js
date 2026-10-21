@@ -1,7 +1,7 @@
 import { inngest } from "../inngest/index.js";
 import Booking from "../models/Booking.js";
 import Show from "../models/Show.js";
-// import stripe from 'stripe';
+import stripe from 'stripe';
 import mongoose from "mongoose";
 
 // Check whether the selected seats are available for a particular movie show.
@@ -52,7 +52,7 @@ export const createBooking = async (req, res) => {
     const { showId, selectedSeats } = req.body;
 
     // Get the frontend URL from request headers (needed for Stripe redirects).
-    // const { origin } = req.headers;
+    const { origin } = req.headers;
 
     console.log("Received showId:", showId, "Type:", typeof showId);
 
@@ -106,47 +106,47 @@ export const createBooking = async (req, res) => {
 
     // STEP 7: STRIPE PAYMENT (currently disabled).
     // If enabled, this section would create a Stripe checkout session.
-    // const stripeInstance = new stripe(process.env.STRIPE_SECRET_KEY);
+    const stripeInstance = new stripe(process.env.STRIPE_SECRET_KEY);
 
     // Define the movie and price information for Stripe checkout.
-    // const line_items = [
-    //   {
-    //     price_data: {
-    //       currency: "usd",
-    //       product_data: {
-    //         name: showData.movie.title,
-    //       },
-    //       unit_amount: Math.floor(booking.amount * 100),
-    //     },
-    //     quantity: 1,
-    //   },
-    // ];
+    const line_items = [
+      {
+        price_data: {
+          currency: "usd",
+          product_data: {
+            name: showData.movie.title,
+          },
+          unit_amount: Math.floor(booking.amount * 100),
+        },
+        quantity: 1,
+      },
+    ];
 
     // Create a Stripe checkout session with success and cancellation URLs.
     // The session expires after 30 minutes.
-    // const session = await stripeInstance.checkout.sessions.create({
-    //   success_url: `${origin}/loading/my-bookings`,
-    //   cancel_url: `${origin}/my-bookings`,
-    //   line_items: line_items,
-    //   mode: "payment",
-    //   metadata: {
-    //     bookingId: booking._id.toString(),
-    //   },
-    //   expires_at: Math.floor(Date.now() / 1000) + 30 * 60,
-    // });
+    const session = await stripeInstance.checkout.sessions.create({
+      success_url: `${origin}/loading/my-bookings`,
+      cancel_url: `${origin}/my-bookings`,
+      line_items: line_items,
+      mode: "payment",
+      metadata: {
+        bookingId: booking._id.toString(),
+      },
+      expires_at: Math.floor(Date.now() / 1000) + 30 * 60,
+    });
 
     // Save the Stripe payment URL in the booking document.
-    // booking.paymentLink = session.url;
-    // await booking.save();
+    booking.paymentLink = session.url;
+    await booking.save();
 
     // STEP 8: Schedule a background task to check payment status.
     // Inngest would process this event asynchronously.
-    // await inngest.send({
-    //   name: "app/checkpayment",
-    //   data: {
-    //     bookingId: booking._id.toString(),
-    //   },
-    // });
+    await inngest.send({
+      name: "app/checkpayment",
+      data: {
+        bookingId: booking._id.toString(),
+      },
+    });
 
     // STEP 9: Return a success response WITHOUT Stripe.
     // Send the created booking details to the frontend.
