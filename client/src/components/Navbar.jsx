@@ -49,7 +49,7 @@ const Navbar = () => {
           >
             Movies
           </Link>
-          <Link
+          {/* <Link
             onClick={() => {
               scrollTo(0, 0);
               setIsOpen(false);
@@ -66,7 +66,7 @@ const Navbar = () => {
             to="/"
           >
             Releases
-          </Link>
+          </Link> */}
           {favoriteMovies.length > 0 && (
             <Link
               onClick={() => {
