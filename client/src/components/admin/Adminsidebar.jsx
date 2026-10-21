@@ -10,8 +10,8 @@ import {
 
 const Adminsidebar = () => {
   const user = {
-    firstName: "John",
-    lastName: "Doe",
+    firstName: "Areeba",
+    lastName: "Waqar",
     imageUrl: assets.profile,
   };
 
