@@ -1,6 +1,7 @@
 import { Inngest } from 'inngest';
 import User from '../models/User.js';
-
+import Booking from '../models/Booking.js';
+import Show from '../models/Show.js';
 // Initialize Inngest
 export const inngest = new Inngest({
   id: 'movie-ticket-booking',
@@ -62,9 +63,65 @@ const syncUserUpdation = inngest.createFunction(
   }
 );
 
+
+const releaseSeatsAndDeleteBookings = inngest.createFunction(
+  {
+    id: 'release-seats-delete-booking',
+    triggers: { event: 'app/checkpayment' },
+  },
+  async ({ event, step }) => {
+    await step.sleep('wait-for-10-minutes', '10m');
+
+    await step.run('check-payment-status', async () => {
+      const bookingId = event.data.bookingId;
+      const booking = await Booking.findById(bookingId);
+
+      // Booking may already have been deleted.
+      if (!booking) {
+        console.log('Booking not found:', bookingId);
+        return;
+      }
+
+      // Keep seats reserved if payment has been completed.
+      if (booking.isPaid) {
+        console.log('Booking is paid. Keeping seats reserved.');
+        return;
+      }
+
+      if (!mongoose.Types.ObjectId.isValid(booking.show)) {
+        console.log('Invalid ObjectId for show:', booking.show);
+        return;
+      }
+
+      const show = await Show.findById(booking.show);
+
+      if (!show) {
+        console.log('Show not found:', booking.show);
+        await Booking.findByIdAndDelete(booking._id);
+        return;
+      }
+
+      // Release only seats belonging to this booking's user.
+      booking.bookedSeats.forEach((seat) => {
+        if (show.occupiedSeats?.[seat] === booking.user) {
+          delete show.occupiedSeats[seat];
+        }
+      });
+
+      show.markModified('occupiedSeats');
+      await show.save();
+
+      await Booking.findByIdAndDelete(booking._id);
+
+      console.log('Unpaid booking deleted and seats released:', bookingId);
+    });
+  }
+);
+
 // Export all functions for Inngest registration
 export const functions = [
   syncUserCreation,
   syncUserDeletion,
   syncUserUpdation,
+  releaseSeatsAndDeleteBookings
 ];
