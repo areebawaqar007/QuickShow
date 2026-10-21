@@ -16,6 +16,7 @@ import Addshow from "./pages/admin/Addshow";
 import Listshows from "./pages/admin/Listshows";
 import Listbookings from "./pages/admin/Listbooking";
 import { useAppContext } from "./context/AppContext";
+import Loading from "./components/Loading";
 const App = () => {
   const isAdminRoute = useLocation().pathname.startsWith("/admin");
   const { user } = useAppContext();
@@ -32,6 +33,8 @@ const App = () => {
         <Route path="/movies/:id" element={<MovieDetails />} />
         <Route path="/movies/:id/:date" element={<SeatLayout />} />
         <Route path="/my-bookings" element={<MyBookings />} />
+        <Route path="/loading/:nextUrl" element={<Loading />} />
+        
         <Route path="/favorite" element={<Favorite />} />
 
         {/* ADMIN ROUTES */}
